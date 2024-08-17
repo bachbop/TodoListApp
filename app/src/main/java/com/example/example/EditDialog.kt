@@ -35,7 +35,7 @@ fun EditDialog(
     var important by remember {
         mutableStateOf("")
     }
-    var date by remember {
+    var time by remember {
         mutableStateOf("")
     }
     var isComplete by remember {
@@ -43,8 +43,6 @@ fun EditDialog(
     }
     val levelImportant = listOf("Low", "Medium", "High")
     val status = listOf("Completed", "Uncompleted")
-    val pickDate =
-        listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
     LaunchedEffect(taskId) {
         viewModel.getTaskById(taskId) {
@@ -54,7 +52,7 @@ fun EditDialog(
                 title = it.title
                 description = it.description.toString()
                 important = it.priority
-                date = it.dueDate
+                time = it.time
                 isComplete = it.isCompleted
             }
         }
@@ -69,13 +67,13 @@ fun EditDialog(
                                     title = title,
                                     description = description,
                                     priority = important,
-                                    dueDate = date,
+                                    time = time,
                                     isCompleted = isComplete
                                 )
                                 viewModel.update(updateTask)
                                 onSave()
                             }) {
-                                Text(text = "Update'=")
+                                Text(text = "Update")
                             }
             },
             dismissButton = { Button(onClick = { onDismiss() }) {
@@ -94,9 +92,13 @@ fun EditDialog(
                         onValueChange = { description = it },
                         label = { Text("Description") },
                     )
-                    important = DropDownMenu(options = levelImportant, label = "Level Important")
-                    date = DropDownMenu(options = pickDate, label = "Date")
-                    isComplete = DropDownMenu(options = status, label = "Status")
+                    important = DropDownMenu(options = levelImportant, label = important)
+                    OutlinedTextField(
+                        value = time,
+                        onValueChange = { time = it },
+                        label = { Text("Time") },
+                    )
+                    isComplete = DropDownMenu(options = status, label = isComplete)
                 }
             }
 

@@ -51,16 +51,13 @@ import com.example.example.viewmodel.TaskViewModel
 @Composable
 fun TaskListScreen(
     taskViewModel: TaskViewModel,
+    navController: NavController
 ) {
     val tasks by taskViewModel.allTasks.observeAsState(listOf())
     var taskById by remember {
         mutableStateOf<Int?>(null)
     }
-
     var showDialog by remember {
-        mutableStateOf(false)
-    }
-    var showUpdateDialog by remember {
         mutableStateOf(false)
     }
     var inputTitle by remember { mutableStateOf("") }
@@ -71,8 +68,6 @@ fun TaskListScreen(
     val empty by remember { mutableStateOf("") }
     val levelImportant = listOf("Low", "Medium", "High")
     val status = listOf("Completed", "Uncompleted")
-    val pickDate =
-        listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("To-Do List") })
@@ -88,7 +83,8 @@ fun TaskListScreen(
                 TaskCard(
                     task = task,
                     deleteOnClick = {taskViewModel.delete(task) },
-                    onClick = {taskById = task.id }
+                    onClick = {navController.navigate("task_detail/${task.id}/${task.title}")},
+                    editOnClick = {taskById = task.id}
                 )
             }
         }
@@ -128,12 +124,11 @@ fun TaskListScreen(
                     Button(onClick = {
                         taskViewModel.insert(
                             Task(
-                                0,
-                                inputTitle,
-                                inputDescription,
-                                inputImportant,
-                                inputDate,
-                                inputComplete
+                                title = inputTitle,
+                                description = inputDescription,
+                                priority = inputImportant,
+                                time = inputDate,
+                                isCompleted = inputComplete
                             )
                         )
                         showDialog = false
@@ -167,9 +162,15 @@ fun TaskListScreen(
                         },
                         placeholder = { Text(text = "Description") }
                     )
-                    inputImportant =
-                        DropDownMenu(options = levelImportant, label = "Level Important")
-                    inputDate = DropDownMenu(options = pickDate, label = "Date")
+                    inputImportant = DropDownMenu(options = levelImportant, label = "Level Important")
+                    OutlinedTextField(
+                        value = inputDate,
+                        onValueChange = { inputDate = it },
+                        label = {
+                            Text(text = "Time")
+                        },
+                        placeholder = { Text(text = "Time") }
+                    )
                     inputComplete = DropDownMenu(options = status, label = "Status")
                 }
             }
